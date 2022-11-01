@@ -1,10 +1,27 @@
 import datetime
-
+from rest_framework.response import Response
 from rest_framework import generics
-
+from .serializers import LoginSerializer, UserCreateSerializer
 from flights import serializers
 from flights.models import Booking, Flight
+from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
+class LoginAPIView(APIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request):
+        data = request.data
+        serializer = LoginSerializer(data=data)
+        if serializer.is_valid(raise_exception=True):
+            valid_data = serializer.data
+            return Response(valid_data, status=HTTP_200_OK)
+        else:
+            return Response(serializer.errors, HTTP_400_BAD_REQUEST)
+
+class UserCreateView(CreateAPIView):
+    serializer_class = UserCreateSerializer
 
 class FlightsList(generics.ListAPIView):
     queryset = Flight.objects.all()
@@ -33,3 +50,8 @@ class UpdateBooking(generics.RetrieveUpdateAPIView):
 class CancelBooking(generics.DestroyAPIView):
     queryset = Booking.objects.all()
     lookup_url_kwarg = "booking_id"
+
+class BookFlight(generics.CreateAPIView):
+    serializer_class = serializers.UpdateBookingSerializer
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

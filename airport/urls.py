@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from flights import views
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("flights/", views.FlightsList.as_view(), name="flights-list"),
@@ -36,4 +37,7 @@ urlpatterns = [
         views.CancelBooking.as_view(),
         name="cancel-booking",
     ),
+    path("login/",views.LoginAPIView.as_view(), name="login" ),
+    path("create/",views.UserCreateView.as_view(), name="create"),
+    path("book/<int:flight_id>/", views.BookFlight.as_view(), name="book-flight"),
 ]
